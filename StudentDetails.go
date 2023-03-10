@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"os"
 
 	"github.com/hyperledger/fabric-chaincode-go/shim"
 	"github.com/hyperledger/fabric-protos-go/peer"
@@ -81,7 +82,7 @@ func CreateStudentdetails(stub shim.ChaincodeStubInterface, args []string) (stri
 		CGPA:       CGPA1,
 		College:    College1,
 	}
-	fmt.Println("Loan data struct:::::", StudentdetailsStruct)
+	fmt.Println("Student details struct:::::", StudentdetailsStruct)
 
 	StudentdetailsBytes, err := json.Marshal(StudentdetailsStruct)
 	if err != nil {
@@ -97,16 +98,16 @@ func CreateStudentdetails(stub shim.ChaincodeStubInterface, args []string) (stri
 		return "", fmt.Errorf("Couldn't save StudentdetailsStruct Characterestic data to ledger")
 	}
 
-	dealMonthIndex := "StudentdetailsIndexx"
-	dealMonthCompKey, err := stub.CreateCompositeKey(dealMonthIndex, []string{StudentdetailsStruct.RegisterNo, StudentdetailsStruct.Name, StudentdetailsStruct.Year, StudentdetailsStruct.Department})
-	fmt.Println("comp key:::", dealMonthCompKey)
+	StudentIndex := "StudentdetailsIndexx"
+	StudentIndexCOmpKey, err := stub.CreateCompositeKey(StudentIndex, []string{StudentdetailsStruct.RegisterNo, StudentdetailsStruct.Name, StudentdetailsStruct.Year, StudentdetailsStruct.Department})
+	fmt.Println("comp key:::", StudentIndexCOmpKey)
 	if err != nil {
 		return "", fmt.Errorf("composite key not found")
 	}
-	fmt.Println(dealMonthCompKey)
+	fmt.Println(StudentIndexCOmpKey)
 
 	value := []byte{0x00}
-	stub.PutState(dealMonthCompKey, value)
+	stub.PutState(StudentIndexCOmpKey, value)
 
 	fmt.Println(args[0])
 
@@ -286,7 +287,7 @@ func GetByYearDeptAndCGPA(stub shim.ChaincodeStubInterface, args []string) (stri
 			return "", fmt.Errorf("Missing RegisterNo in ledger")
 		}
 
-		buffer.WriteString(string(value))g
+		buffer.WriteString(string(value))
 		bArrayMemberAlreadyWritten = true
 	}
 	buffer.WriteString("]")
@@ -365,4 +366,22 @@ func GetByNameYearDeptCGPAandCollege(stub shim.ChaincodeStubInterface, args []st
 	fmt.Println("Data for Name,Year,Dept,CGPA,College", buffer.String())
 
 	return buffer.String(), nil
+}
+
+func main() {
+	server := &shim.ChaincodeServer{
+		CCID:    os.Getenv("CHAINCODE_CCID"),
+		Address: os.Getenv("CHAINCODE_ADDRESS"),
+		CC:      new(Studentdetails),
+		TLSProps: shim.TLSProperties{
+			Disabled: true,
+		},
+	}
+
+	err := server.Start()
+
+	if err != nil {
+		fmt.Printf("Error starting Studentdetails chaincode: %s", err)
+	}
+
 }
