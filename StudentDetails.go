@@ -98,16 +98,44 @@ func CreateStudentdetails(stub shim.ChaincodeStubInterface, args []string) (stri
 		return "", fmt.Errorf("Couldn't save StudentdetailsStruct Characterestic data to ledger")
 	}
 
-	StudentIndex := "StudentdetailsIndexx"
-	StudentIndexCOmpKey, err := stub.CreateCompositeKey(StudentIndex, []string{StudentdetailsStruct.RegisterNo, StudentdetailsStruct.Name, StudentdetailsStruct.Year, StudentdetailsStruct.Department})
-	fmt.Println("comp key:::", StudentIndexCOmpKey)
+	/////NameYearAndDept CompKey
+
+	NameYearAndDept := "StudentdetailsIndexx"
+	NameYearAndDeptCompKey, err := stub.CreateCompositeKey(NameYearAndDept, []string{StudentdetailsStruct.Name, StudentdetailsStruct.Year, StudentdetailsStruct.Department, StudentdetailsStruct.RegisterNo})
+	fmt.Println("comp key:::", NameYearAndDeptCompKey)
 	if err != nil {
 		return "", fmt.Errorf("composite key not found")
 	}
-	fmt.Println(StudentIndexCOmpKey)
+	fmt.Println(NameYearAndDeptCompKey)
 
 	value := []byte{0x00}
-	stub.PutState(StudentIndexCOmpKey, value)
+	stub.PutState(NameYearAndDeptCompKey, value)
+
+	//////////// YearDepCgpa
+
+	YearDepCgpaIndex1 := "YearDepCgpaIndex"
+	YearDeptCgpaCompKey, err := stub.CreateCompositeKey(YearDepCgpaIndex1, []string{StudentdetailsStruct.Year, StudentdetailsStruct.Department, StudentdetailsStruct.Department, StudentdetailsStruct.CGPA, StudentdetailsStruct.RegisterNo})
+	fmt.Println("comp key:::", YearDeptCgpaCompKey)
+	if err != nil {
+		return "", fmt.Errorf("composite key not found")
+	}
+	fmt.Println(YearDeptCgpaCompKey)
+
+	value1 := []byte{0x00}
+	stub.PutState(YearDeptCgpaCompKey, value1)
+	///////NameYearDeptCGPAandCollege
+
+	NameYearDeptCGPAandCollegeIndex1 := "NameYearDeptCGPAandCollegendex"
+	NameYearDeptCGPAandCollegeCompKey, err := stub.CreateCompositeKey(NameYearDeptCGPAandCollegeIndex1, []string{StudentdetailsStruct.Name, StudentdetailsStruct.Year, StudentdetailsStruct.Department, StudentdetailsStruct.CGPA, StudentdetailsStruct.RegisterNo})
+	fmt.Println("comp key:::", NameYearDeptCGPAandCollegeCompKey)
+	if err != nil {
+		return "", fmt.Errorf("composite key not found")
+	}
+	fmt.Println(NameYearDeptCGPAandCollegeCompKey)
+
+	value2 := []byte{0x00}
+	stub.PutState(NameYearDeptCGPAandCollegeCompKey, value2)
+	/////////
 
 	fmt.Println(args[0])
 
@@ -150,7 +178,7 @@ func GetStudentdetailsByNameYearAndDept(stub shim.ChaincodeStubInterface, args [
 	fmt.Println("Name::::", Name)
 	fmt.Println("Year::::", Year)
 	fmt.Println("Dept::::", Department)
-	mdMapItr, err := stub.GetStateByPartialCompositeKey("StudenDetailsIndexx", []string{Name, Year, Department})
+	mdMapItr, err := stub.GetStateByPartialCompositeKey("StudentDetailsIndexx", []string{Name, Year, Department})
 	if err != nil {
 		return "", fmt.Errorf("Could not get composite key for this Name, Year, Dept")
 	}
@@ -248,7 +276,7 @@ func GetByYearDeptAndCGPA(stub shim.ChaincodeStubInterface, args []string) (stri
 	fmt.Println("Year::::", Year)
 	fmt.Println("Department::::", Department)
 	fmt.Println("CGPA:::", CGPA)
-	mdMapItr, err := stub.GetStateByPartialCompositeKey("StudenDetailsIndexx", []string{Year, Department, CGPA})
+	mdMapItr, err := stub.GetStateByPartialCompositeKey("YearDepCgpaIndex", []string{Year, Department, CGPA})
 	if err != nil {
 		return "", fmt.Errorf("Could not get composite key for this Year Dept, CGPA")
 	}
